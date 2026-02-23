@@ -55,9 +55,8 @@ __global__ void find_interceptions(int *A, int *B, int N)
 {
   int tid = threadIdx.x;
   int gid = blockIdx.x * blockDim.x + tid;
-  int stride = blockDim.x * gridDim.x;
 
-  while (gid < N)
+  if (gid < N)
   {
     int a_i = A[gid];
     int b_i = A[N + gid];
@@ -82,7 +81,5 @@ __global__ void find_interceptions(int *A, int *B, int N)
         }
       }
     }
-
-    gid += stride;
   }
 }

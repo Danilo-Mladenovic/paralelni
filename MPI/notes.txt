@@ -1,0 +1,20 @@
+
+Kartezijan topologija
+
+Komunikatori definisu procese koji mogu medjusobno da komuniciraju.
+Podela:
+- Intra: kom izmedju procesa u okviru jedne grupe.
+- Inter: kom izmedju procesa razlicitih grupa. [Ne radi se]
+
+
+
+Virtuelna topologija
+
+Predstavlja logicko uredjenje procesa u topologije tipa 1D, 2D i 3D.
+
+MPI ima dve vrste topologija:
+- Kortezijan
+- Graf [Ne radi se]
+
+
+

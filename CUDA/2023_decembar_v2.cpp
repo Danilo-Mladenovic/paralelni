@@ -1,35 +1,32 @@
-
 // Koriscenjem CUDA tehnologije, u programskom jeziku C/C++ napisati program koji od dve kvadratne
 // matrice jednakih dimenzija A i B kreira matricu C takvu da je C[i][j] = A[i][j] - 2 * B[i][j],
-// i kreira vektor ciji je i-ti element minimalna vrednost i-te kolone matrice C. Obratiti paznju
+// i kreira vektor ciji je i-ti element minimalna vrednost i-te vrste matrice C. Obratiti paznju
 // na efikasnost paralelizacije.
 
-% cuda
+% % cuda
 #include <stdio.h>
 #include <stdlib.h>
-#include <climits>
 
 #define N 4000
 #define NUM_OF_THREADS 256
 
-        __global__ void calculateVector(int *A, int *B, int *C, int *V, int n)
+        __global__ void calculateVector(int *A, int *B, int *C, int *D, int N)
 {
   __shared__ int shared_data[NUM_OF_THREADS];
 
   int tid = threadIdx.x;
 
-  // grid-stride: jedan blok obradjuje jednu kolonu, pa se pomera za gridDim.x
-  int col = blockIdx.x;
-  while (col < n)
+  // grid-stride: jedan blok obradjuje jednu vrstu, pa se pomera za gridDim.x
+  int row = blockIdx.x;
+  while (row < N)
   {
     int local_min = INT_MAX;
 
-    // niti bloka dele redove ove kolone, racunaju C i svoj lokalni min
-    for (int row = tid; row < n; row += blockDim.x)
+    // niti bloka dele kolone ove vrste, racunaju C i svoj lokalni min
+    for (int col = tid; col < N; col += blockDim.x)
     {
-      int c = A[row * n + col] - 2 * B[row * n + col];
-      C[row * n + col] = c;
-
+      int c = A[row * N + col] - 2 * B[row * N + col];
+      C[row * N + col] = c;
       if (c < local_min)
         local_min = c;
     }
@@ -46,49 +43,48 @@
     }
 
     if (tid == 0)
-      V[col] = shared_data[0];
+      D[row] = shared_data[0];
 
-    __syncthreads(); // da sledeca kolona ne prepise shared_data prerano
+    __syncthreads(); // da sledeca vrsta ne prepise shared_data prerano
 
-    col += gridDim.x;
+    row += gridDim.x;
   }
 }
 
 int main()
 {
-  size_t matrix_size = N * N * sizeof(int);
-  size_t vector_size = N * sizeof(int);
+  type_t matrix_size = N * N sizeof(int);
+  type_t vector_size = N * sizeof(int);
 
   int *A = (int *)malloc(matrix_size);
   int *B = (int *)malloc(matrix_size);
   int *C = (int *)malloc(matrix_size);
-  int *V = (int *)malloc(vector_size);
+  int *D = (int *)malloc(vector_size);
 
-  int *d_A, *d_B, *d_C, *d_V;
+  int *d_A, *d_B, *d_C, *d_D;
 
   cudaMalloc((void **)&d_A, matrix_size);
   cudaMalloc((void **)&d_B, matrix_size);
   cudaMalloc((void **)&d_C, matrix_size);
-  cudaMalloc((void **)&d_V, vector_size);
+  cudaMalloc((void **)&d_D, vector_size);
 
   for (int i = 0; i < N; i++)
   {
     for (int j = 0; j < N; j++)
     {
-      A[i * N + j] = rand() % 100 + i;
-      B[i * N + j] = rand() % 50 + j;
+      A[i * N + j] = rand() % 100;
+      B[i * N + j] = rand() % 100;
     }
   }
 
-  cudaMemcpy(d_A, A, matrix_size, cudaMemcpyHostToDevice);
-  cudaMemcpy(d_B, B, matrix_size, cudaMemcpyHostToDevice);
+  cudaMemCpy(d_A, A, matrix_size, cudaMemCpyHostToDevice);
+  cudaMemCpy(d_B, B, matrix_size, cudaMemCpyHostToDevice);
 
   int NUM_OF_BLOCKS = min(N / NUM_OF_THREADS + 1, NUM_OF_THREADS);
+  calculateVector<<<NUM_OF_BLOCKS, NUM_OF_THREADS>>>(d_A, d_B, d_C, d_D, N);
 
-  calculateVector<<<NUM_OF_BLOCKS, NUM_OF_THREADS>>>(d_A, d_B, d_C, d_V, N);
-
-  cudaMemcpy(C, d_C, matrix_size, cudaMemcpyDeviceToHost);
-  cudaMemcpy(V, d_V, vector_size, cudaMemcpyDeviceToHost);
+  cudaMemCpy(C, d_C, matrix_size, cudaMemCpyDeviceToHost);
+  cudaMemCpy(D, d_D, vector_size, cudaMemCpyDeviceToHost);
 
   for (int i = 0; i < N; i++)
   {
@@ -101,18 +97,18 @@ int main()
 
   for (int i = 0; i < N; i++)
   {
-    printf("%d, ", V[i]);
+    prinf("%d, ", D[i]);
   }
 
-  cudaFree(d_V);
-  cudaFree(d_C);
-  cudaFree(d_B);
   cudaFree(d_A);
+  cudaFree(d_B);
+  cudaFree(d_C);
+  cudaFree(d_D);
 
-  free(V);
-  free(C);
-  free(B);
   free(A);
+  free(B);
+  free(C);
+  free(D);
 
-  return 0;
+  return 1;
 }

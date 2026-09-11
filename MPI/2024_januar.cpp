@@ -25,14 +25,14 @@ int main(int argc, char **argv)
     {
       for (int j = 0; j < N; j++)
       {
-        A[i][j] = i * j;
+        A[i * N + j] = i * j;
       }
     }
 
-    for (int i = 0; j < N; j++)
+    for (int i = 0; i < N; i++)
     {
       b[i] = i;
-      A_local[i] = A[0][i];
+      A_local[i] = A[i];
     }
 
     for (int i = 1; i < size; i++)

@@ -37,7 +37,7 @@ int main(int argc, char **argv)
     b_p[i]++;
   }
 
-#pragma omp parallel for firstprivate(a_p) reduction(* : a_p)
+#pragma omp parallel for reduction(* : a_p)
   for (i = 0; i < N; i++)
   {
     a_p *= 4;

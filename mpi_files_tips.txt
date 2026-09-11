@@ -1,0 +1,23 @@
+upotreba pojedinacnih pokazivaca => seek + write/read
+sa eksplicitnim pomerajem => read_at/write_at
+ne moze da se predvidi koj proces sta cita => read_shared/write_shared
+
+kada svi procesi vrse upis/citanje => set view i read_all/write_all
+kada se preklapa sa nekom vremenski zahtevnom operacijom => write_all_begin i write_all_end
+
+mpi_seek ofset => u bajtovima
+read_at/write_at => u bajtovima
+set_view => u bajtovima
+datarep uvek native
+
+stride(type vector) => od poslednjeg elementa
+arr of displacements(type indexed) => od pocetka
+
+create_darray => g_sizes i p_sizes DOLE PA DESNO 
+		distribs = MPI_DISTRIBUTE_BLOCK
+		dargs= MPI_DISTRIBUTE_DFLT_DARG
+
+
+MPI_SEEK_SET - pomeraj od pocetka fjla
+MPI_SEEK_END - trenutna pozicija pokazivaca + pomeraj
+MPI_SEEK_CUR - pointer se postavlja na kraj fajla + pomeraj

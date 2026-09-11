@@ -3,10 +3,11 @@
 #include <stdlib.h>
 
 #include <mpi.h>
+#include <math.h>
 
 #define n 8
 #define p 16
-#define MCW MPI_COMM_WORLD #include<math.h>
+#define MCW MPI_COMM_WORLD
 
 void main(int argc, char *argv[])
 {

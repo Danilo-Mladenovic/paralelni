@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <omp.h>
-#include <stdboo.h>
+#include <stdbool.h>
 
 #define N 32
 #define offset 4

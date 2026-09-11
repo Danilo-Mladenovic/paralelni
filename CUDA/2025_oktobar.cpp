@@ -1,3 +1,10 @@
+// Na programskom jeziku C/C++, koriscenjem CUDA tehnologije, napisati program koji u nizu
+// A, duzine n, koji predstavlja RNK sekvencu, pronalazi trazenu podsekvencu, duzine m.
+// Svaka RNK sekvenca i podsekvenca se sastoje od nukleotida (A, U, C, G). Rezultat upisati
+// u niz B, koji na pocetku svake pronadjene sekvence upisuje 1, a na ostalim pozicijama 0.
+// Obratiti paznju na efikasnost paralelizacije. Omoguciti povezivanje kernela za matrice
+// proizvoljne velicine
+
 % % cuda
 
 #include <stdio.h>
@@ -76,9 +83,9 @@ __global__ void find_sequence(char *A, char *pattern, int n, int m, int *B);
     {
       int found = 1;
 
-      for (int i = gid; i < gid + m; i++)
+      for (int i = 0; i < m; i++)
       {
-        if (A[i] != = pattern[i])
+        if (A[gid + i] != pattern[i])
         {
           found = 0;
           break;
